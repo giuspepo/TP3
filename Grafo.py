@@ -75,3 +75,39 @@ class Grafo:
 		visitados.append(actual)
 		for w in self.adyacentes(actual)
 			self.dfs(w,visitados,cant_corte,cont +1)
+	
+	def random_walks(self, largo, inicial):		
+	recorrido = []	
+	v = inicial	
+	if not inicial v = random.choice(self.vertice)	
+	recorrido.append(v)	
+		
+	for x in range(0, largo):	
+		v = random.choice(self.grafo[v])
+		recorrido.append(v)
+		
+	return recorrido	
+	
+	def label_propagation (self):		
+	label = {}	
+	#inicializamos	
+	i = 0	
+	for v in self.vertice:	
+		label[v] = i
+		i += 1
+	#Aqui va una condicion. algo desde que un vertice y sus vecinos tengan todos el mismo label, o un maximo de iteraciones.	
+	while not condicion:	
+		for v in self.vertice:
+			if self.grafo[v] == [] continue		
+					
+			freq = {}		
+			for w in self.grafo[v]:		
+				if not label[w] in freq:	
+					freq[label[w]] = 0
+				freq[label[w]] += 1	
+			#Devuelve el label con la mayor frecuencia		
+			lmax = max(freq.iterkeys(), key=(lamda key: freq[key]))		
+			label[v] = lmax
+			
+		#Las comunidades son aquellos grupos de vertices que tienen el mismo label	
+	
