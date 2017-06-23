@@ -19,10 +19,13 @@ class Grafo:
 	def agregar_vertice_con_ady(self, nuevo, ady):
 		"""agrega un vertice nuevo al grafo, adyacentes es una lista"""
 		self.grafo[nuevo] = ady
-		if self.dirigido == False:
-			for elem in ady:
-				if elem in self.grafo:
-					(self.grafo[elem]).append(nuevo)
+		for elem in ady:
+			#crea el vertice si no existia
+			if not elem in self.grafo:
+				self.grafo[elem] = []
+			#crea la arista de regreso si el grafo no es dirigido
+			if self.dirigido == False:
+				(self.grafo[elem]).append(nuevo)
 
 	def agregar_vertice(self,vertice)
 		if not vertice in self.grafo:
@@ -30,17 +33,19 @@ class Grafo:
 
 	def agregar_arista(self, origen, vecino):
 		"""agrega arista entre dos vertices del grafo"""
-		if origen in self.grafo:
-			self.grafo[origen].append(vecino)
-
+		#Esto lo resume un poco. Si no estan los vertices los crea. 
 		if not origen in self.grafo:
-			self.grafo[origen] = [vecino]
+			self.grafo[origen] = []
+		if not vecino in self.grafo:
+			self.grafo[vecino] = []
+		#luego crea la arista
+		self.grafo[origen].append(vecino)
 
-		if vecino in self.grafo:
+		#si la arista no es dirigida
+		if self.dirigido == False:
 			self.grafo[vecino].append(origen)
 
-		if not vecino in self.grafo:
-			self.grafo[vecino] = [origen]
+		
 
 	def son_adyacentes(self, vertice, adyacente):
 		"""devuelve true si algunos de los parametros se encuentra en la lista de
