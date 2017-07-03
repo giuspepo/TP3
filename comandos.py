@@ -123,14 +123,15 @@ def dfs(grafo, actual, visitados = []):
 	for w in grafo.adyacentes(actual):
 		dfs(grafo, w,visitados,cant_corte,cont +1)
 		
-def funcion (hash, x, padre, extra) : 
+def funcion_1 (hash, x, padre, extra) : 
 	if padre == None:
 		hash[x] = 0
 	else:
 		hash[x] = hash[padre] + 1
-	return true
-#tu bfs
-"""def bfs(grafo, inicio, extra):
+	return True
+#mi bfs
+"""
+def bfs(grafo, inicio, funcion, extra):
 	""itera en anchura la cantidad de vertices""
 	visitados, pila = {}, [inicio]
 	bool = funcion(visitados, inicio, None, extra)
@@ -144,21 +145,25 @@ def funcion (hash, x, padre, extra) :
 				pila.append(w)
 	return visitados
 """
-
-def bfs_visitar(grafo,inicio,extra):
-	visitados, orden, padre = {}, {}, {}
-	pila =  [inicio]
-	visitados[origen] = True
-	orden[origen] = 0
-	padres[origen] = None
-	while len(pila) > 0:
-		actual = pila.pop()
+#tu bfs
+def bfs(grafo,inicio):
+	visitados = {}
+	orden = {}
+	padre = {}
+	cola =  [inicio]
+	visitados[inicio] = True
+	orden[inicio] = 0
+	padre[inicio] = None
+	while len(cola) > 0:
+		actual = cola.pop(0)
 		for w in grafo.adyacentes(actual):
 			if not w in visitados:
-				pila.append(w)
+				cola.append(w)
 				visitados[w] = True
 				orden[w] = orden[actual] + 1
 				padre[w] = actual
+	orden_y_padre = [orden,padre]
+	return orden_y_padre
 				
 
 def funcion_2(tabla, x, padre, extra) : 
@@ -166,31 +171,37 @@ def funcion_2(tabla, x, padre, extra) :
 		return not x == extra
 
 def caminos(grafo, origen, final):
-	recorrido = bfs(grafo, origen, final)
-
-	#luego de hacer todo el recorrido
+	if not grafo.existe_vertice(origen) or not grafo.existe_vertice(final):
+		print("No existe el vertice")
+		return []
+	#recorrido es una lista con dos diccionarios:
+	#uno es orden (o mas bien distancia del origen), 
+	#y el otro es padre (el anterior)
+	recorrido = bfs(grafo, origen)
 	camino = []
 	actual = final
-	while not actual == NULL:
+	while not actual == None:
 		camino.insert(0, actual) 
-		actual = recorrido[actual]
+		actual = recorrido[1][actual]
 	return camino
 	
 def distancias(grafo, origen):
-	recorrido = bfs(grafo, origen, None)
-
+	if not grafo.existe_vertice(origen):
+		print("No existe el vertice")
+		return
+	recorrido = bfs(grafo, origen)
 	contador = {}
-	for v in recorrido:
-		if not recorrido[v] in contador:
-			contador[recorrido[v]] = 0
-		contador[recorrido[v]] += 1
+	for v in recorrido[0]:
+		if not recorrido[0][v] in contador:
+			contador[recorrido[0][v]] = 0
+		contador[recorrido[0][v]] += 1
 
 	#Aqui comienza la impresion	
 	print("Distancias {}".format(origen))
-	int = 1
-	while contador.has_key(int):
-		print("Distancia {}: {}".format(int,contador[int]))
-		int +=1
+	i = 1
+	while contador.has_key(i):
+		print("Distancia {}: {}".format(i,contador[i]))
+		i +=1
 
 def centralidad_exacta(grafo, n):	
 	recorridos = {} #O(1)
@@ -260,8 +271,9 @@ def label_propagation (grafo):
 	comun = comunidad.keys()
 	
 	for v in comun: #O(comunidad)
-	      lon = len(comunidad[v])
-	      if (MIN_COMUNIDADES < lon < MAX_COMUNIDADES):
+		print("Comunidad {}:".format(v))
+		lon = len(comunidad[v])
+		if (MIN_COMUNIDADES < lon < MAX_COMUNIDADES):
 	      		for elem in comunidad[v]:
 	      			print(elem)
 	 
@@ -293,10 +305,10 @@ def main():
 				distancias(grafo,comandos[POS_ID])
 		elif comandos[0] == "caminos":
 			if validar_cant_comandos(comandos,3):
-				caminos(grafo, comandos[POS_ID], comandos[POS_CANT])
+				print("{}".format(caminos(grafo, comandos[POS_ID], comandos[POS_CANT])))
 		elif comandos[0] == "centralidad":
 			if validar_cant_comandos(comandos,2):
-				centralidad_exacta(grafo, int(comandos[POS_ID]))
+				print("{}".format(centralidad_exacta(grafo, int(comandos[POS_ID]))))
 		elif comandos[0] == "recomendar":
 			if validar_cant_comandos(comandos,3):
 				print("{}".format(recomendar(grafo, comandos[POS_ID], int(comandos[POS_CANT]))))
