@@ -6,46 +6,79 @@ class Grafo:
 		"""..."""
 		self.grafo = {}
 		self.dirigido = bool_dirigido 
+		self.cant_aristas = 0
+		self.cant_vertices = 0
+		
+	def vertices(self):
+		return self.grafo.keys()
+
+	def es_dirigido(self):
+		return self.dirigido
 
 	def adyacentes(self, vertice):
 		"""devuelve una lista de adyacentes del vertice pasado por parametro,
 		si no tiene ninguno devuelve lista vacia"""
+		if not self.existe_vertice(vertice):
+			return None
 		return self.grafo[vertice]
 
-	def inicio_aleatorio(self):
+	def vertice_ady_aleatorio(self,vertice):
 		"""elige un vertice aleatorio para iniciar el recorrido"""
-		return random.choice(self.vertice)
+		if not self.existe_vertice(vertice):
+			return random.choice(self.grafo.keys())
+		return random.choice(self.adyacentes(vertice))
 
-	def agregar_vertice_con_ady(self, nuevo, ady):
-		"""agrega un vertice nuevo al grafo, adyacentes es una lista"""
-		self.grafo[nuevo] = ady
-		if self.dirigido == False:
-			for elem in ady:
-				if elem in self.grafo:
-					(self.grafo[elem]).append(nuevo)
-
-	def agregar_vertice(self,vertice)
+	def agregar_vertice(self,vertice):
+		"""si no existe vertice lo agrega"""
+		if self.existe_vertice(vertice):
+			raise ValueError("El vertice ya existe")
 		if not vertice in self.grafo:
 			self.grafo[vertice] = []
+			self.cant_vertices += 1
 
 	def agregar_arista(self, origen, vecino):
-		"""agrega arista entre dos vertices del grafo"""
-		if origen in self.grafo:
-			self.grafo[origen].append(vecino)
+		"""agrega arista entre dos vertices del grafo, si alguno no existe en el grafico, lo crea"""
+		if not self.existe_vertice(origen) or not self.existe_vertice(vecino):
+			raise ValueError("No existe alguno de los vertices")
+		if self.son_adyacentes(origen, vecino):
+			raise ValueError ("Ya estan conectados")
+		#if origen in self.grafo: no have falta. Ya preguntamos eso hace un rato.
+		self.grafo[origen].append(vecino)
 
-		if not origen in self.grafo:
-			self.grafo[origen] = [vecino]
-
-		if vecino in self.grafo:
+		if not self.dirigido:
 			self.grafo[vecino].append(origen)
+		self.cant_aristas += 1
 
-		if not vecino in self.grafo:
-			self.grafo[vecino] = [origen]
+	def quitar_vertice(self, vertice):
+		"""quita un vertice del grafo y elimina sus adyacencias del resto de los vertices"""
+		if not self.existe_vertice(vertice):
+			raise ValueError("El vertice no existe")
+		for clave in self.grafo.keys():
+			if vertice in self.grafo[clave]:
+				self.grafo[clave].remove(vertice)
+				self.cant_aristas -= 1
+		#elimina las aristas que conecta el vertice
+		#Si el grafo no es dirigido se asume que ya se borraron cuando se recorrio anteriormente
+		if not self.dirigido:
+			self.cant_aristas -= len(self.grafo[vertice])
+		del self.grafo[vertice]
+		self.cant_vertices -= 1
 
-	def son_adyacentes(self, vertice, adyacente):
+	def quitar_arista(self, origen, vecino):
+		"""Elimina la union entre dos vertices"""
+		if not self.son_adyacentes(origen, vecino):
+			raise ValueError("No estan conectados")
+		self.grafo[origen].remove(vecino)
+		if not self.dirigido:
+			self.grafo[vecino].remove(origen)
+		self.cant_aristas -= 1
+
+	def son_adyacentes(self, vertice, vecino):
 		"""devuelve true si algunos de los parametros se encuentra en la lista de
 		adyacencias del otro, independientemente de que sea dirigido o no"""
-		return (adyacente in self.grafo[vertice]) or (vertice in self.grafo[adyacente])
+		if not self.existe_vertice(vertice) or not self.existe_vertice(vecino):
+			raise ValueError("No existe alguno de los vertices")
+		return (vecino in self.grafo[vertice]) or (vertice in self.grafo[vecino])
 
 	def existe_vertice(self, vertice):
 		"""comprueba si un vertice se encuentra en el grafo"""
@@ -53,25 +86,12 @@ class Grafo:
 
 	def cantidad_vertices(self):
 		"""devuelve la cantidad de vertices en el grafo"""
-		return len(self.grafo)
+		return self.cant_vertices
 
-	def bfs(self, inicio, cant_corte = self.cantidad_vertices()):
-		"""itera en anchura la cantidad de vertices, totales o las que se pasen por parametro"""
-		visitados, pila = [], [inicio]
-		cont = 0
-		while pila and not cont == cant_corte:
-			actual = pila.pop()
-			for w in self.adyacentes(actual):
-				if not w in visitados:
-					visitados.append(w)
-					pila.append(w)
-					cont += 1
-		return visitados
-
-	def dfs(self, actual, visitados = [], cant_corte = self.cantidad_vertices(), cont = 1):
-		"""itera en profundidad, """
-		if cont == cant_cor:
-			return visitados
-		visitados.append(actual)
-		for w in self.adyacentes(actual)
-			self.dfs(w,visitados,cant_corte,cont +1)
+	def cantidad_aristas(self):
+		"""devuelve la cantidad de aristas del grafo"""
+		return self.cant_aristas
+	
+	def __iter__(self):
+		"""crea un iterador del grafo"""
+		return iter(self.grafo)
